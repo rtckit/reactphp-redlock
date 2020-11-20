@@ -1,0 +1,44 @@
+{
+  "name": "rtckit/react-redlock",
+  "description": "Asynchronous distributed locks with Redis and ReactPHP",
+  "version": "1.0.0",
+  "type": "library",
+  "keywords": [
+    "lock",
+    "mutex",
+    "redis",
+    "redlock",
+    "react",
+    "reactphp"
+  ],
+  "homepage": "https://github.com/rtckit/reactphp-redlock",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ciprian Dosoftei"
+    }
+  ],
+  "support": {
+    "email": "hello@rtckit.io",
+    "issues": "https://github.com/rtckit/reactphp-redlock/issues"
+  },
+  "require": {
+    "php": ">=7.1",
+    "clue/redis-react": "^2.0"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^0.12",
+    "phpunit/phpunit": "^9.4",
+    "vimeo/psalm": "^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "RTCKit\\React\\Redlock\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "RTCKit\\React\\Redlock\\": "tests/"
+    }
+  }
+}
