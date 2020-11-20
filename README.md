@@ -3,7 +3,7 @@
 Asynchronous [Redlock](https://redis.io/topics/distlock) algorithm implementation for PHP
 
 [![Build Status](https://travis-ci.com/rtckit/reactphp-redlock.svg?branch=main)](https://travis-ci.com/rtckit/reactphp-redlock)
-[![Latest Stable Version](https://poser.pugx.org/rtckit/react-redlock/v/stable.png)](https://packagist.org/packages/rtckit/rtckit/react-redlock)
+[![Latest Stable Version](https://poser.pugx.org/rtckit/react-redlock/v/stable.png)](https://packagist.org/packages/rtckit/react-redlock)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/aff5ee8e8ef3b51689c2/test_coverage)](https://codeclimate.com/github/rtckit/reactphp-redlock/test_coverage)
 [![Maintainability](https://api.codeclimate.com/v1/badges/aff5ee8e8ef3b51689c2/maintainability)](https://codeclimate.com/github/rtckit/reactphp-redlock/maintainability)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
