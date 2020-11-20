@@ -79,7 +79,7 @@ Lastly, the provided [examples](examples) are a good starting point.
 
 ## Requirements
 
-Redlock is compatible with PHP 7.1+ and has no external library and extension dependencies.
+Redlock is compatible with PHP 7.2+ and requires the [clue/reactphp-redis](https://github.com/clue/reactphp-redis) library.
 
 ## Installation
 

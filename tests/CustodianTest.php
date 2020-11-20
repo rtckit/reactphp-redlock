@@ -145,7 +145,7 @@ class CustodianTest extends TestCase
                 resolve(null),
                 resolve(null),
                 resolve(null),
-                resolve(null),
+                resolve(null)
             );
 
         $custodian = new Custodian($loop, $this->client);

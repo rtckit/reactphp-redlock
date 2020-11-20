@@ -23,7 +23,7 @@
     "issues": "https://github.com/rtckit/reactphp-redlock/issues"
   },
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.2",
     "clue/redis-react": "^2.0"
   },
   "require-dev": {
