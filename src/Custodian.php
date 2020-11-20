@@ -57,6 +57,7 @@ EOD;
             $token = Lock::generateToken();
         }
 
+        /** @psalm-suppress InvalidScalarArgument */
         return $this->client->set($resource, $token, 'NX', 'PX', (int) round($ttl * 1000))
             ->then(function (?string $reply) use ($resource, $ttl, $token): ?Lock {
                 if (is_null($reply) || ($reply !== 'OK')) {
@@ -109,6 +110,7 @@ EOD;
      */
     public function release(Lock $lock): PromiseInterface
     {
+        /** @psalm-suppress InvalidScalarArgument */
         return $this->client->eval(self::RELEASE_SCRIPT, 1, $lock->getResource(), $lock->getToken())
             ->then(function (?string $reply): bool {
                 return $reply === '1';
