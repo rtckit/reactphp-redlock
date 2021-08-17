@@ -9,7 +9,7 @@ error_reporting(-1);
 require(__DIR__ . '/../vendor/autoload.php');
 
 use Clue\React\Redis\Factory as RedisFactory;
-use React\EventLoop\Factory as LoopFactory;
+use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 use RTCKit\React\Redlock\Custodian;
 use RTCKit\React\Redlock\Lock;
@@ -23,14 +23,13 @@ if (!$host) {
 }
 
 /* Instantiate prerequisites */
-$loop = LoopFactory::create();
-$factory = new RedisFactory($loop);
+$factory = new RedisFactory(Loop::get());
 $client = $factory->createLazyClient($host);
 
 /* Instantiate our lock custodian */
-$custodian = new Custodian($loop, $client);
+$custodian = new Custodian($client);
 
-$loop->addTimer(0.001, function () use ($custodian, $loop): void {
+Loop::addTimer(0.001, function () use ($custodian): void {
     $custodian->acquire('01-basic', 1)
         ->then(function (?Lock $lock) use ($custodian): PromiseInterface {
             if (is_null($lock)) {
@@ -58,11 +57,9 @@ $loop->addTimer(0.001, function () use ($custodian, $loop): void {
         ->otherwise(function (Throwable $t): void {
             echo "Something bad happened:" . PHP_EOL . " > " . $t->getMessage() . PHP_EOL;
         })
-        ->always(function() use ($loop): void {
-            $loop->stop();
+        ->always(function(): void {
+            Loop::stop();
 
             echo "Bye!" . PHP_EOL;
         });
 });
-
-$loop->run();
