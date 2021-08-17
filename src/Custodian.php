@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace RTCKit\React\Redlock;
 
 use Clue\React\Redis\Client;
-use React\EventLoop\LoopInterface;
+use React\EventLoop\Loop;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use function bin2hex;
@@ -23,21 +23,16 @@ else
 end
 EOD;
 
-    /** @var LoopInterface Event loop we're bound to */
-    private $loop;
-
     /** @var Client ReactPHP Redis client */
     private $client;
 
     /**
      * Custodian constructor
      *
-     * @param LoopInterface $loop Event loop we're bound to
      * @param Client $client ReactPHP Redis client
      */
-    public function __construct(LoopInterface $loop, Client $client)
+    public function __construct(Client $client)
     {
-        $this->loop = $loop;
         $this->client = $client;
     }
 
@@ -91,7 +86,7 @@ EOD;
                 if (!is_null($lock)) {
                     $deferred->resolve($lock);
                 } else {
-                    $this->loop->addTimer($interval, function () use ($deferred, $attempts, $interval, $resource, $ttl, $token) {
+                    Loop::addTimer($interval, function () use ($deferred, $attempts, $interval, $resource, $ttl, $token) {
                         $deferred->resolve($this->spin(--$attempts, $interval, $resource, $ttl, $token));
                     });
                 }

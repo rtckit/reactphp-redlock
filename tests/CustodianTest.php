@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace RTCKit\React\Redlock;
 
 use PHPUnit\Framework\TestCase;
-use React\EventLoop\Factory;
+use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 use function React\Promise\resolve;
 
@@ -14,7 +14,6 @@ use function React\Promise\resolve;
  */
 class CustodianTest extends TestCase
 {
-    private $loop;
     private $client;
 
     /**
@@ -22,13 +21,12 @@ class CustodianTest extends TestCase
      */
     public function setUpFactory()
     {
-        $this->loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
         $this->client = $this->getMockBuilder('Clue\React\Redis\Client')->getMock();
     }
 
     public function testConstructor()
     {
-        $custodian = new Custodian($this->loop, $this->client);
+        $custodian = new Custodian($this->client);
 
         $this->assertNotNull($custodian);
         $this->assertInstanceOf(Custodian::class, $custodian);
@@ -41,7 +39,7 @@ class CustodianTest extends TestCase
             ->with('set', ['resource', 'r4nd0m', 'NX', 'PX', 60000])
             ->willReturn(resolve('OK'));
 
-        $custodian = new Custodian($this->loop, $this->client);
+        $custodian = new Custodian($this->client);
 
         $promise = $custodian->acquire('resource', 60, 'r4nd0m');
 
@@ -64,7 +62,7 @@ class CustodianTest extends TestCase
             ->with('set', ['2fail', 'r4nd0m', 'NX', 'PX', 60000])
             ->willReturn(resolve(null));
 
-        $custodian = new Custodian($this->loop, $this->client);
+        $custodian = new Custodian($this->client);
 
         $promise = $custodian->acquire('2fail', 60, 'r4nd0m');
 
@@ -82,7 +80,7 @@ class CustodianTest extends TestCase
             ->method('__call')
             ->willReturn(resolve('OK'));
 
-        $custodian = new Custodian($this->loop, $this->client);
+        $custodian = new Custodian($this->client);
 
         $promise = $custodian->acquire('resource', 60);
 
@@ -100,8 +98,6 @@ class CustodianTest extends TestCase
 
     public function testSuccessfulSpin()
     {
-        $loop = Factory::create();
-
         $this->client->expects($this->exactly(5))
             ->method('__call')
             ->with('set', ['resource', 'r4nd0m', 'NX', 'PX', 60000])
@@ -113,30 +109,28 @@ class CustodianTest extends TestCase
                 resolve('OK')
             );
 
-        $custodian = new Custodian($loop, $this->client);
+        $custodian = new Custodian($this->client);
 
         $promise = $custodian->spin(5, 0.000001, 'resource', 60, 'r4nd0m');
 
         $this->assertNotNull($promise);
         $this->assertInstanceOf(PromiseInterface::class, $promise);
 
-        $promise->then(function (?Lock $lock) use ($loop) {
+        $promise->then(function (?Lock $lock) {
             $this->assertNotNull($lock);
             $this->assertInstanceOf(Lock::class, $lock);
             $this->assertEquals('resource', $lock->getResource());
             $this->assertEquals(60, $lock->getTTL());
             $this->assertEquals('r4nd0m', $lock->getToken());
 
-            $loop->stop();
+            Loop::stop();
         });
 
-        $loop->run();
+        Loop::run();
     }
 
     public function testFailedSpin()
     {
-        $loop = Factory::create();
-
         $this->client->expects($this->exactly(5))
             ->method('__call')
             ->with('set', ['resource', 'r4nd0m', 'NX', 'PX', 60000])
@@ -148,20 +142,20 @@ class CustodianTest extends TestCase
                 resolve(null)
             );
 
-        $custodian = new Custodian($loop, $this->client);
+        $custodian = new Custodian($this->client);
 
         $promise = $custodian->spin(5, 0.000001, 'resource', 60, 'r4nd0m');
 
         $this->assertNotNull($promise);
         $this->assertInstanceOf(PromiseInterface::class, $promise);
 
-        $promise->then(function (?Lock $lock) use ($loop) {
+        $promise->then(function (?Lock $lock) {
             $this->assertNull($lock);
 
-            $loop->stop();
+            Loop::stop();
         });
 
-        $loop->run();
+        Loop::run();
     }
 
     public function testSuccessfulRelease()
@@ -172,7 +166,7 @@ class CustodianTest extends TestCase
             ->willReturn(resolve('1'));
 
         $lock = new Lock('release', 60, 'r4nd0m');
-        $custodian = new Custodian($this->loop, $this->client);
+        $custodian = new Custodian($this->client);
 
         $promise = $custodian->release($lock);
 
@@ -192,7 +186,7 @@ class CustodianTest extends TestCase
             ->willReturn(resolve('0'));
 
         $lock = new Lock('release', 60, 'r4nd0m');
-        $custodian = new Custodian($this->loop, $this->client);
+        $custodian = new Custodian($this->client);
 
         $promise = $custodian->release($lock);
 
