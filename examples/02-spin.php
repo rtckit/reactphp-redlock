@@ -9,7 +9,7 @@ error_reporting(-1);
 require(__DIR__ . '/../vendor/autoload.php');
 
 use Clue\React\Redis\Factory as RedisFactory;
-use React\EventLoop\Factory as LoopFactory;
+use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 use RTCKit\React\Redlock\Custodian;
 use RTCKit\React\Redlock\Lock;
@@ -22,15 +22,14 @@ if (!$host) {
 }
 
 /* Instantiate prerequisites */
-$loop = LoopFactory::create();
-$factory = new RedisFactory($loop);
+$factory = new RedisFactory(Loop::get());
 $client = $factory->createLazyClient($host);
 
 /* Instantiate our lock custodian */
-$custodian = new Custodian($loop, $client);
+$custodian = new Custodian($client);
 
 /* First routine to acquire the lock */
-$loop->addTimer(0.001, function () use ($custodian): void {
+Loop::addTimer(0.001, function () use ($custodian): void {
     /* Lock '02-spin' for 5 seconds */
     $custodian->acquire('02-spin', 5)
         ->then(function (?Lock $lock): void {
@@ -46,7 +45,7 @@ $loop->addTimer(0.001, function () use ($custodian): void {
 });
 
 /* Hopeful routine, attempting to eventually acquire the lock */
-$loop->addTimer(1, function ($timer) use ($custodian, $loop): void {
+Loop::addTimer(1, function ($timer) use ($custodian): void {
     /* Attempt to lock '02-spin', trying up to 7 times with a one second pause between retries.
        Once secured, hold the lock for 10 seconds. */
     $custodian->spin(7, 1, '02-spin', 10)
@@ -60,11 +59,9 @@ $loop->addTimer(1, function ($timer) use ($custodian, $loop): void {
         ->otherwise(function (Throwable $t): void {
             echo "[hopeful] Something bad happened:" . PHP_EOL . " > " . $t->getMessage() . PHP_EOL;
         })
-        ->always(function() use ($loop): void {
-            $loop->stop();
+        ->always(function(): void {
+            Loop::stop();
 
             echo "Bye!" . PHP_EOL;
         });
 });
-
-$loop->run();

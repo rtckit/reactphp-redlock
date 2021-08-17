@@ -10,16 +10,15 @@ Asynchronous [Redlock](https://redis.io/topics/distlock) algorithm implementatio
 
 ## Quickstart
 
-Once [installed](#installation), you can incorporate Redlock in your projects by instantiating its _Custodian_; this entity is responsible for lock orchestration and it requires access to your process's event loop as well as to a Redis client object instance, e.g.
+Once [installed](#installation), you can incorporate Redlock in your projects by instantiating its _Custodian_; this entity is responsible for lock orchestration and it requires access to a Redis client object instance, e.g.
 
 ```php
 /* Instantiate prerequisites */
-$loop = \React\EventLoop\Factory::create();
 $factory = new \Clue\React\Redis\Factory($loop);
 $client = $factory->createLazyClient('127.0.0.1');
 
 /* Instantiate our lock custodian */
-$custodian = new \RTCKit\React\Redlock\Custodian($loop, $client);
+$custodian = new \RTCKit\React\Redlock\Custodian($client);
 ```
 
 #### Acquiring locks
@@ -106,7 +105,7 @@ composer install
 Then, go to the project root and run:
 
 ```bash
-php -d memory_limit=-1 ./vendor/bin/phpunit
+php -d memory_limit=-1 ./vendor/bin/phpunit -c ./etc/phpunit.xml.dist
 ```
 
 ### Static Analysis
@@ -114,8 +113,8 @@ php -d memory_limit=-1 ./vendor/bin/phpunit
 In order to ensure high code quality, Redlock uses [PHPStan](https://github.com/phpstan/phpstan) and [Psalm](https://github.com/vimeo/psalm):
 
 ```sh
-php -d memory_limit=-1 ./vendor/bin/phpstan analyse -n -vvv --ansi --level=max src
-php -d memory_limit=-1 ./vendor/bin/psalm --show-info=true
+php -d memory_limit=-1 ./vendor/bin/phpstan analyse -c ./etc/phpstan.neon -n -vvv --ansi --level=max src
+php -d memory_limit=-1 ./vendor/bin/psalm --config=./etc/psalm.xml --show-info=true
 ```
 
 ## License
