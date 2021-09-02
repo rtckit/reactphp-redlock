@@ -14,7 +14,7 @@ Once [installed](#installation), you can incorporate Redlock in your projects by
 
 ```php
 /* Instantiate prerequisites */
-$factory = new \Clue\React\Redis\Factory(\React\EventLoop\Loop::get());
+$factory = new \Clue\React\Redis\Factory();
 $client = $factory->createLazyClient('127.0.0.1');
 
 /* Instantiate our lock custodian */

@@ -22,7 +22,7 @@ if (!$host) {
 }
 
 /* Instantiate prerequisites */
-$factory = new RedisFactory(Loop::get());
+$factory = new RedisFactory();
 $client = $factory->createLazyClient($host);
 
 /* Instantiate our lock custodian */
