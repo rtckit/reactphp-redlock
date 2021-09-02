@@ -1,7 +1,7 @@
 {
   "name": "rtckit/react-redlock",
   "description": "Asynchronous distributed locks with Redis and ReactPHP",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "library",
   "keywords": [
     "lock",
@@ -24,7 +24,7 @@
   },
   "require": {
     "php": ">=7.2",
-    "clue/redis-react": "^2.4",
+    "clue/redis-react": "^2.5",
     "react/event-loop": "^1.2"
   },
   "require-dev": {
